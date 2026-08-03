@@ -1,0 +1,11 @@
+--- WORKSPACE
++++ WORKSPACE
+@@ -609,6 +609,8 @@
+ http_archive(
+     name = "opencv",
+     build_file_content = all_content,
++    patch_args = ["-p1"],
++    patches = ["//rosto_bridge:opencv3-macos-fp.patch"],
+     strip_prefix = "opencv-3.4.11",
+     urls = ["https://github.com/opencv/opencv/archive/3.4.11.tar.gz"],
+ )

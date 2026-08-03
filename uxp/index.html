@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="styles.css">
+  <script src="js/premiere.js"></script>
+  <script src="js/analysis.js"></script>
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Rosto Natural</h1>
+      <p class="tagline">Pele tratada. Traços preservados.</p>
+    </div>
+    <span class="badge">LOCAL</span>
+  </header>
+  <div class="mode"><span></span><div><strong>Modo automático</strong>
+    <small>Um rosto principal, sem remodelar.</small></div></div>
+  <p class="hint">Selecione um clipe de vídeo.</p>
+  <button id="apply" class="primary">Aplicar ao clipe</button>
+  <button id="analyze">Analisar movimento</button>
+  <div id="progress" hidden><div id="bar"></div></div>
+  <p id="status" role="status">Pronto.</p>
+
+  <section>
+    <div class="section-title"><h2>Aprimoramento</h2>
+      <button id="reset" class="text-button">Restaurar</button></div>
+    <label>Intensidade <output id="masterValue">72</output>
+      <input id="master" type="range" min="0" max="100" value="72">
+    </label>
+    <label>Pele <output id="skinValue">58</output>
+      <input id="skin" type="range" min="0" max="100" value="58">
+    </label>
+    <label>Preservar textura <output id="textureValue">75</output>
+      <input id="texture" type="range" min="0" max="100" value="75">
+    </label>
+    <label>Olheiras <output id="underEyeValue">42</output>
+      <input id="underEye" type="range" min="0" max="100" value="42">
+    </label>
+    <label>Uniformizar tom <output id="toneValue">24</output>
+      <input id="tone" type="range" min="0" max="100" value="24">
+    </label>
+    <label>Brilho da pele <output id="shineValue">30</output>
+      <input id="shine" type="range" min="0" max="100" value="30">
+    </label>
+    <label>Olhos <output id="eyesValue">18</output>
+      <input id="eyes" type="range" min="0" max="100" value="18">
+    </label>
+  </section>
+  <section class="hair">
+    <h2>Acabamento do cabelo <span class="beta">BETA</span></h2>
+    <label>Cabelos rebeldes <output id="flyawaysValue">0</output>
+      <input id="flyaways" type="range" min="0" max="100" value="0">
+    </label>
+    <p class="section-note">70 é natural; 100 alcança fios mais claros e
+      longos. Em planos difíceis, limite a área com uma máscara nos Controles
+      de Efeitos.</p>
+  </section>
+  <section class="makeup">
+    <h2>Maquiagem leve</h2>
+    <label>Blush <output id="blushValue">0</output>
+      <input id="blush" type="range" min="0" max="100" value="0">
+    </label>
+    <label>Cor do blush <input id="blushColor" type="color" value="#db5766"></label>
+    <label>Lábios <output id="lipsValue">20</output>
+      <input id="lips" type="range" min="0" max="100" value="20">
+    </label>
+    <label>Cor dos lábios <input id="lipColor" type="color" value="#9e2933"></label>
+  </section>
+  <label class="toggle"><input id="beforeAfter" type="checkbox">
+    Mostrar original</label>
+</body>
+</html>

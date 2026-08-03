@@ -1,0 +1,25 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+
+package(default_visibility = ["//visibility:public"])
+licenses(["notice"])
+exports_files(["opencv3-macos-fp.patch"])
+
+cc_binary(
+    name = "libRostoMediaPipe.dylib",
+    srcs = [
+        "rosto_mediapipe_bridge.cpp",
+        "rosto_mediapipe_bridge.h",
+    ],
+    copts = [
+        "-std=c++17",
+        "-fvisibility=hidden",
+    ],
+    linkshared = True,
+    linkstatic = True,
+    deps = [
+        "//mediapipe/framework/formats:image",
+        "//mediapipe/framework/formats:image_frame",
+        "//mediapipe/tasks/cc/vision/face_landmarker:face_landmarker",
+        "//mediapipe/tasks/cc/vision/image_segmenter:image_segmenter",
+    ],
+)

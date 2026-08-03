@@ -1,0 +1,22 @@
+--- WORKSPACE
++++ WORKSPACE
+@@ -850,14 +850,16 @@
+ # make sure to bump Eigen version as well and vice versa.
+ EIGEN_COMMIT = "4c38131a16803130b66266a912029504f2cf23cd"
+ 
+-EIGEN_SHA256 = "1a432ccbd597ea7b9faa1557b1752328d6adc1a3db8969f6fe793ff704be3bf0"
++EIGEN_SHA256 = "adb259c774a241bbac05f85f477d8bcd1315ca528960434de43b0510ae1efe15"
+ 
+ http_archive(
+     name = "eigen",
+     build_file = "@//third_party:eigen.BUILD",
+     sha256 = EIGEN_SHA256,
+-    strip_prefix = "eigen-{commit}".format(commit = EIGEN_COMMIT),
+-    urls = ["https://gitlab.com/libeigen/eigen/-/archive/{commit}/eigen-{commit}.tar.gz".format(commit = EIGEN_COMMIT)],
++    strip_prefix = "eigen-{commit}-{commit}".format(commit = EIGEN_COMMIT),
++    urls = [
++        "https://gitlab.com/api/v4/projects/15462818/repository/archive.tar.gz?sha={commit}".format(commit = EIGEN_COMMIT),
++    ],
+ )
+ 
+ # Halide

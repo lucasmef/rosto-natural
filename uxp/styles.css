@@ -1,0 +1,126 @@
+:root {
+  color: #ececec;
+  background: #202020;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 16px; }
+header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+h1 { font-size: 20px; line-height: 1.1; margin: 0; letter-spacing: -.2px; }
+h2 { font-size: 13px; margin: 0; text-transform: uppercase;
+  letter-spacing: .7px; color: #c7c7c7; }
+.tagline { color: #999; margin: 5px 0 0; font-size: 11px; }
+.badge {
+  color: #a8ddff;
+  background: #173e56;
+  border: 1px solid #225b79;
+  border-radius: 10px;
+  padding: 2px 7px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+.mode {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border-radius: 6px;
+  background: #292929;
+  border: 1px solid #3b3b3b;
+}
+.mode > span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #55c984;
+  box-shadow: 0 0 0 3px rgba(85, 201, 132, .12);
+}
+.mode strong, .mode small { display: block; }
+.mode strong { font-size: 12px; font-weight: 600; }
+.mode small { color: #999; margin-top: 2px; font-size: 10px; }
+.hint { color: #999; margin: 11px 0 7px; }
+button {
+  width: 100%;
+  margin: 4px 0;
+  border: 1px solid #555;
+  border-radius: 5px;
+  padding: 9px;
+  color: #eee;
+  background: #3c3c3c;
+  font-weight: 600;
+}
+button.primary {
+  border-color: #2684e8;
+  background: #1473e6;
+}
+button:disabled { opacity: .45; }
+button.text-button {
+  width: auto;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  color: #7db9f8;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 500;
+}
+#status { min-height: 17px; margin: 8px 0 0; color: #aaa; font-size: 11px; }
+#status.error { color: #ff8a80; }
+section { border-top: 1px solid #424242; margin-top: 14px; padding-top: 12px; }
+.section-title { display: flex; align-items: center; justify-content: space-between; }
+section.makeup h2 { margin-bottom: 12px; }
+.beta {
+  color: #a8ddff;
+  font-size: 8px;
+  margin-left: 5px;
+  letter-spacing: .5px;
+}
+.section-note {
+  color: #999;
+  font-size: 10px;
+  line-height: 1.4;
+  margin: -2px 0 3px;
+}
+label { display: block; margin: 10px 0; color: #ddd; }
+output { float: right; color: #aaa; font-variant-numeric: tabular-nums; }
+input[type=range] {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  accent-color: #2684e8;
+}
+input[type=color] {
+  float: right;
+  width: 35px;
+  height: 22px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background: transparent;
+}
+.toggle {
+  border-top: 1px solid #424242;
+  margin-top: 14px;
+  padding-top: 13px;
+}
+.toggle input { margin-right: 7px; accent-color: #2684e8; }
+#progress {
+  height: 4px;
+  background: #414141;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 3px;
+}
+#bar {
+  width: 0;
+  height: 100%;
+  background: #2d9dff;
+  transition: width .1s;
+}

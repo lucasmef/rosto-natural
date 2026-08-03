@@ -1,0 +1,60 @@
+.DS_Store
+Thumbs.db
+
+# Dependencias e toolchains locais
+/.deps/
+/.python-deps/
+/.python-legacy/
+/.toolchain/
+/vendor/
+/bazel-*/
+
+# Modelos e artefatos de validacao (permanecem somente no Mac)
+/models/
+/artifacts/
+/dist/
+/*.json
+*.log
+
+# Builds nativos e pacotes gerados
+/build*/
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+*.a
+*.dylib
+*.so
+*.o
+*.obj
+*.zip
+*.ccx
+*.plugin
+
+# Python, JavaScript e caches de teste
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+coverage/
+.coverage
+
+# Midias pessoais e temporarios
+*.mov
+*.MOV
+*.mp4
+*.MP4
+*.m4v
+*.wav
+*.WAV
+*.aif
+*.aiff
+*.jpg
+*.jpeg
+*.png
+*.heic
+*.tiff
+*.tmp
+*.bak
+*~
