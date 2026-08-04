@@ -44,6 +44,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    effective_strength = float(np.clip(args.strength, 0.0, 1.0))
     image = cv2.imread(str(args.image), cv2.IMREAD_COLOR)
     if image is None:
         raise FileNotFoundError(f"Could not read image: {args.image}")
@@ -73,7 +74,7 @@ def main() -> int:
                 str(height),
                 str(preview.shape[1]),
                 str(preview.shape[0]),
-                str(float(np.clip(args.strength, 0.0, 1.0))),
+                str(effective_strength),
                 str(input_path),
                 str(probability_path),
                 str(result_path),
@@ -117,6 +118,8 @@ def main() -> int:
     ) if np.any(changed) else 0.0
     report: dict[str, object] = {
         **native_metrics,
+        "requested_strength": args.strength,
+        "effective_strength": effective_strength,
         "dimensions": [width, height],
         "changed_pixels": int(np.count_nonzero(changed)),
         "changed_fraction": float(np.mean(changed)),
@@ -130,8 +133,12 @@ def main() -> int:
         "line_energy_before": changed_energy_before,
         "line_energy_after": changed_energy_after,
     }
+    exact_bypass = bool(np.array_equal(result, image))
     checks = {
-        "reconstruction_is_local": 0 < report["changed_fraction"] < .04,
+        "reconstruction_is_local": (
+            exact_bypass if effective_strength == 0.0
+            else 0 < report["changed_fraction"] < .04
+        ),
         "face_is_unchanged": report["changed_inside_face"] == 0,
         "protected_hair_is_unchanged":
             report["changed_inside_protected_hair"] == 0,

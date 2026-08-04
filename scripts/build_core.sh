@@ -54,8 +54,11 @@ mkdir -p "$BUILD_DIR"
 if [ -x "$PROJECT_DIR/.toolchain/node/bin/node" ]; then
   "$PROJECT_DIR/.toolchain/node/bin/node" \
     "$PROJECT_DIR/tests/uxp_analysis_test.js"
+  "$PROJECT_DIR/.toolchain/node/bin/node" \
+    "$PROJECT_DIR/tests/uxp_premiere_test.js"
 elif command -v node >/dev/null 2>&1; then
   node "$PROJECT_DIR/tests/uxp_analysis_test.js"
+  node "$PROJECT_DIR/tests/uxp_premiere_test.js"
 else
   echo "warning: Node.js unavailable; UXP tests skipped" >&2
 fi

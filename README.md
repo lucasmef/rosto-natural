@@ -1,7 +1,7 @@
 # Rosto Natural
 
 Efeito local de aprimoramento facial, maquiagem leve e acabamento de cabelos
-rebeldes para Adobe Premiere Pro. A v0.11 foi calibrada usando os 15 pares
+rebeldes para Adobe Premiere Pro. A v0.11 foi calibrada usando os 17 pares
 `cru / -facetune` encontrados neste Mac. O FaceTune é a única referência
 aprovada e o efeito não altera a geometria do rosto.
 
@@ -17,8 +17,9 @@ aprovada e o efeito não altera a geometria do rosto.
   reconstrução esparsa do fundo;
 - slider de cabelos de 0 a 100: zero é bypass, 70 é natural e 100 alcança fios
   mais claros e longos;
-- painel UXP 0.11 e adaptador de efeito com match name
-  `com.lucas.RostoNatural`;
+- painel UXP 0.11 e adaptador de efeito com match name canônico
+  `com.lucas.RostoNatural`; o Premiere 26.3 o expõe na cadeia como
+  `AE.com.lucas.RostoNatural`;
 - núcleo CPU de referência e shader Metal com a mesma matemática facial.
 
 ## Preset aprovado
@@ -38,26 +39,26 @@ aprovada e o efeito não altera a geometria do rosto.
 
 ## Portão FaceTune
 
-São avaliados três quadros de cada um dos 15 pares reais, totalizando 45
+São avaliados três quadros de cada um dos 17 pares reais, totalizando 51
 amostras. A comparação remove somente a deriva global da recodificação,
 estimada fora do rosto. Qualquer tratamento local continua visível na métrica.
 
 | Medida | Rosto Natural | FaceTune |
 |---|---:|---:|
-| Microtextura | 0,715541 | 0,703905 |
-| Textura fina | 0,655024 | 0,645249 |
-| Textura média | 0,668634 | 0,671587 |
-| Nitidez da mandíbula | 0,989505 | 0,949602 |
-| Alteração fora do rosto (0–255) | 0,015938 | 1,968870 |
+| Microtextura | 0,715541 | 0,706220 |
+| Textura fina | 0,640518 | 0,634980 |
+| Textura média | 0,652850 | 0,662981 |
+| Nitidez da mandíbula | 0,989655 | 0,948513 |
+| Alteração fora do rosto (0–255) | 0,015519 | 2,014436 |
 | Luminância da pele | -0,002251 | -0,001298 |
 | Luminância das olheiras | -0,016058 | -0,015642 |
-| Saturação dos olhos | -0,021290 | -0,020720 |
-| Luminância dos olhos | -0,003421 | -0,003707 |
-| Saturação dos lábios | +0,013080 | +0,012964 |
-| Luminância dos lábios | -0,003580 | -0,003284 |
+| Saturação dos olhos | -0,021593 | -0,020790 |
+| Luminância dos olhos | -0,003425 | -0,003101 |
+| Saturação dos lábios | +0,012897 | +0,012508 |
+| Luminância dos lábios | -0,003626 | -0,003195 |
 
 O tratamento ficou 7,98% mais próximo do FaceTune em cor e 15,15% em
-estrutura do que o vídeo cru. O pior dos 15 vídeos ainda melhorou 2,82% em cor
+estrutura do que o vídeo cru. O pior dos 17 vídeos ainda melhorou 2,82% em cor
 e 9,18% em estrutura. O portão tem 17 critérios e falha se qualquer tolerância
 for ultrapassada.
 
@@ -69,11 +70,16 @@ Relatórios:
 - `facetune_texture_gate.json`
 - `facetune_similarity_gate.json`
 
-Execute novamente com:
+Execute novamente somente sobre uma pasta de referência explicitamente
+autorizada:
 
 ```sh
-./scripts/validate_against_facetune.sh "/Users/lucas/Movies/Vídeos/Edit"
+./scripts/validate_against_facetune.sh "/caminho/explicitamente-autorizado"
 ```
+
+Em 03/08/2026 o resultado 17/17 foi reagregado a partir dos quatro relatórios
+existentes, cobrindo 51 amostras. Os vídeos pessoais de origem não foram
+relidos nessa execução.
 
 ## Cabelos rebeldes
 
@@ -113,14 +119,17 @@ python3 tools/validate_adobe_contract.py
 
 Resultado atual:
 
-- 15 testes do núcleo C++;
+- 16 testes do núcleo C++;
 - 1 teste do adaptador C++/MediaPipe;
-- 3 testes UXP;
-- 11 verificações do contrato Adobe;
-- referência CPU 3840×2160: aproximadamente 0,45–0,59 s por quadro.
+- 12 testes do analisador UXP e 9 testes da ponte UXP/Premiere;
+- 18 verificações do contrato Adobe;
+- referência CPU offline 3840×2160: aproximadamente 0,57 s por quadro.
 
-O caminho CPU é a referência de equivalência. A reprodução fluida em 4K
-dependerá da ligação final do shader Metal ao GPU Device Suite.
+O adaptador Adobe implementa hoje somente o caminho CPU clássico de 8 bits.
+Os artefatos `.air` e `.metallib` compilam com a toolchain oficial, mas ainda
+não são carregados pelo render nem incorporados ao bundle/ZIP nativo. Portanto
+não há alegação de Smart Render, float/deep color ou reprodução 4K fluida. O
+número acima é benchmark offline, não desempenho medido no Premiere.
 
 ## MediaPipe nativo
 
@@ -139,9 +148,12 @@ Preparação:
 ROSTO_BUILD_JOBS=4 ./scripts/prepare_mediapipe.sh
 ```
 
-O build usa no máximo quatro tarefas e grava detalhes em
-`build-mediapipe.log`. Ele foi pausado para não competir com o trabalho atual;
-o cache já contém a maior parte das etapas.
+O build usa no máximo quatro tarefas, grava detalhes em `build-mediapipe.log`
+e publica a ponte mais oito dylibs OpenCV como um conjunto transacional. O
+checkout está fixado no commit
+`f8ef212d5c962c0e853db7e59d217056b187084b`; arquitetura, assinatura, rpaths,
+dependências, versão mínima do macOS e hashes são revalidados antes e depois do
+swap recuperável.
 
 Teste de inferência real após a biblioteca existir:
 
@@ -186,14 +198,17 @@ Metal:
 ./scripts/build_metal.sh
 ```
 
-Painel de desenvolvimento:
+Painel de desenvolvimento e CCX oficial do UDT:
 
 ```sh
 ./scripts/package_uxp.sh
+./scripts/package_uxp_ccx.sh --replace
 ```
 
-Esse comando produz um ZIP de desenvolvimento com checksum. O `.ccx` oficial
-deve ser produzido pelo UXP Developer Tool.
+O primeiro comando produz um ZIP com checksum; o segundo usa o UXP Developer
+Tool 2.2+ instalado para produzir o `.ccx`. A release final (ZIP UXP, CCX,
+bundle nativo e checksums fechados) é criada por `./scripts/package_release.sh`
+somente depois que o bundle nativo existir.
 
 Instalação local, somente quando combinado e com o Premiere fechado:
 
@@ -201,8 +216,81 @@ Instalação local, somente quando combinado e com o Premiere fechado:
 ./scripts/install_when_ready.sh --confirm
 ```
 
-O instalador recusa execução sem `--confirm` e se recusa a instalar enquanto o
-processo do Premiere estiver aberto.
+O instalador valida fonte, stage e destino, recusa execução sem `--confirm` e
+se recusa a instalar enquanto Premiere Pro, PProHeadless, Adobe Media Encoder,
+After Effects ou `aerender` estiverem abertos.
+Se já houver uma instalação identificada como este produto, obtenha confirmação
+explícita e use `--confirm --replace`; o bundle anterior fica em backup único.
+Para remover de forma recuperável, com os hosts fechados:
+
+```sh
+./scripts/uninstall_when_ready.sh --confirm
+```
+
+### Carregar o painel local
+
+Depois de instalar o bundle nativo com todos os hosts fechados, o fluxo
+validado no Premiere 26.3 usa o UXP Developer Tool 2.2.1:
+
+1. abra o Premiere com um projeto seguro;
+2. no UXP Developer Tool, escolha `Add Plugin` e selecione
+   `uxp/manifest.json` deste repositório;
+3. selecione `Rosto Natural` na lista e escolha `Load`;
+4. abra o painel `Rosto Natural` pelo menu de plugins/extensões do Premiere.
+
+O `.ccx` também é gerado e validado como artefato de release, mas distribuição
+externa exige a identidade e a assinatura apropriadas da Adobe. O gate real
+desta versão carregou o painel pelo UXP Developer Tool.
+
+### Uso
+
+1. selecione exatamente um clipe de vídeo na sequência; o áudio vinculado pode
+   permanecer selecionado junto;
+2. abra o painel `Rosto Natural` e escolha `Aplicar efeito`;
+3. ajuste intensidade, pele, textura, olhos, olheiras, tom, brilho, blush,
+   lábios e cabelos rebeldes; `Mostrar original` alterna a comparação;
+4. para estabilização temporal por malha facial, escolha `Analisar movimento`
+   e aguarde a confirmação do cache;
+5. `Restaurar preset` volta ao preset natural. Cabelos em `0` é bypass exato,
+   `70` é o preset natural e `100` amplia a busca autorizada.
+
+O analisador aceita sequências progressivas, pixels quadrados, velocidade
+constante e até 7.200 quadros por execução. Trim, 0,5×, 1×, 2× e reverso têm
+mapeamento explícito; rampas de velocidade falham fechadas e preservam o cache
+anterior. A captura usa tokens HOLD correlacionados e lease de 10 segundos.
+Sessões incompletas antigas são limpas apenas após validação estrita do
+namespace temporário; conteúdo inesperado ou symlink é preservado, não seguido.
+Esses invariantes passam nos testes automatizados. A API UXP 26.3 permite ler,
+mas não alterar velocidade ou reverso; por isso a matriz de retiming não foi
+forçada com API privada nem edição direta do projeto e permanece um gate
+automatizado, não uma alegação de teste real no host.
+
+## Validação no Premiere 26.3
+
+Em projeto e mídia temporários seguros, o bundle nativo 0.11.0 foi reconhecido
+e o efeito `AE.com.lucas.RostoNatural` foi aplicado sem travamento. Um gate
+isolado começou com uma cadeia contendo somente Opacity/Motion e confirmou a
+inclusão de exatamente uma instância pelo nome registrado `AE.`. O painel UXP
+carregou, atualizou `Lábios` de 20 para 37 e a cor ao vivo, e o valor nativo 37
+foi confirmado. Undo restaurou 20 e Redo restaurou 37.
+
+O gate de quadro TGA 720×1280 confirmou que o preset facial altera somente a
+região do rosto: 98.442 pixels, ou 10,6816% do quadro, com zero alteração nos
+420 pixels superiores, 100 inferiores e 80 laterais. Cabelo em zero foi bypass
+exato; 70 alterou 13.279 pixels (1,440864%) e 100 alterou 21.837
+(2,369466%), sempre com zero pixels no rosto, cabelo protegido e fora da área
+permitida.
+
+A análise real processou e detectou rosto nos 210/210 quadros em 3,54 s. O
+cache final contém somente `landmarks.bin` e `metadata.json`; captura, sessão e
+token voltaram a zero, sem keyframes. Falhas induzidas antes da promoção
+limparam suas sessões sem substituir o cache aprovado.
+
+A exportação combinada de 7 s, 720×1280, 30 fps e 210 quadros terminou em
+4,53 s no caminho CPU. Uma exportação original pelo mesmo preset de codec serviu
+como controle; ambas decodificaram 210/210 quadros. Os quadros 0, 60, 120 e 209
+foram inspecionados e mantiveram tratamento sutil, contorno estável e ausência
+de deformação visível.
 
 ## Estrutura
 
@@ -218,7 +306,14 @@ processo do Premiere estiver aberto.
 
 ## Limite atual
 
-Todos os gates offline passam. Ainda faltam o SDK Adobe, o Xcode completo, o
-UXP Developer Tool, a conclusão da biblioteca MediaPipe e o primeiro
-carregamento real no Premiere. Até esse teste no host, o projeto é uma
-implementação offline validada, não um plugin instalado.
+As dependências estão atendidas com Adobe SDK 25.6, Xcode 26.6 build 17F113,
+Metal Toolchain 17F109 e UXP Developer Tool 2.2.1. O bundle nativo foi
+compilado, instalado e validado; o efeito e o painel já passaram pela primeira
+aplicação, atualização ao vivo, análise e exportação no Premiere 26.3. Para uso
+local no caminho implementado, os critérios do produto estão atendidos.
+
+O runtime instalado continua CPU clássico de 8 bits: `.air` e `.metallib`
+compilam, mas ainda não são carregados nem entram no bundle. Não há Smart
+Render, float/deep color ou promessa de 4K fluido. A medição real acima mostra
+tempo menor que o tempo real em 720×1280; a referência CPU offline 4K permanece
+em aproximadamente 0,48–0,57 s por quadro.

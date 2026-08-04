@@ -18,27 +18,35 @@ alterar o rosto ou reconstruir áreas não autorizadas do fundo.
 7. No modo guiado, a composição final é recortada exatamente pela região
    autorizada.
 
-## Gate da imagem enviada
+## Gates nativos atuais
 
-Arquivo: `flyaway_validation_gate.json`.
+Relatórios: `native_flyaway_analysis_gate.json` e
+`native_flyaway_render_gate.json`.
 
-| Verificação | Resultado |
-|---|---:|
-| Pixels selecionados em 100% | 38.438 |
-| Fração do quadro em 100% | 5,0984% |
-| Mudanças fora da vizinhança da máscara | 0 |
-| Mudanças dentro da proteção do rosto | 0 |
-| Mudanças fora da região guiada | 0 |
-| Pixels da máscara fora da região guiada | 0 |
-| Sobreposição com o cabelo protegido | 0 |
-| Redução da energia das linhas em 100% | 28,3996% |
+| Verificação | 70% | 100% |
+|---|---:|---:|
+| Pixels na máscara de análise | 3.729 | 6.419 |
+| Fração da análise | 1,981824% | 3,411458% |
+| Pixels alterados no render | 10.813 | 17.325 |
+| Fração do render | 1,434237% | 2,297989% |
+| Energia de linha antes | 6,243503 | 5,725599 |
+| Energia de linha depois | 4,397115 | 3,842655 |
 
-Todos os seis testes passaram.
+Em zero, o render é bypass exato, sem pixel alterado. Em 70 e 100 houve zero
+alterações no rosto, no cabelo protegido e fora da área permitida. A retenção
+de cabelo forte foi 100% e a sobreposição entre as máscaras
+permitida/protegida foi zero. A análise passou 6/6 verificações e o render
+passou 5/5.
 
-O preset natural de 70% continua disponível: seleciona 23.410 pixels
-(3,1051%) e reduz a energia das linhas em 34,9466%. A energia percentual é
-menor em 100% porque o denominador passa a incluir também os fios residuais
-claros, de baixa energia, que antes não faziam parte da máscara.
+Hashes SHA-256 dos relatórios canônicos:
+
+- análise: `13babc79045878797567deebd4a332b67176993814f1c4f64b998c362327cc59`;
+- render: `ba2e327f275a221f9b2588866882a0bb8aa16c7748aafff77cb43d32aa2fea24`.
+
+O relatório de análise agrega os níveis 70 e 100. O relatório canônico de
+render e seu hash correspondem à execução final em 100; os números de bypass
+0 e força 70 da tabela vieram das execuções anteriores preservadas da mesma
+bateria, não desse único JSON.
 
 ## Slider de intensidade
 
@@ -52,13 +60,26 @@ claros, de baixa energia, que antes não faziam parte da máscara.
 
 O controle `Cabelos rebeldes` começa em zero. A bateria facial foi repetida
 depois da inclusão do módulo: os 17 testes contra o FaceTune continuam
-passando nos 42 quadros dos 14 pares.
+passando nos 51 quadros dos 17 pares.
 
-## Limite atual
+## Gate real no Premiere 26.3
 
-O protótipo de análise e as reconstruções C++ automática e anisotrópica estão
-implementados. A ligação do
-HairSegmenter ao render do efeito e o teste da máscara nativa do Premiere
-dependem do SDK Adobe e do Mac desbloqueado. O filtro temporal adaptativo da
-máscara já está no núcleo e possui teste determinístico; falta alimentá-lo com
-quadros reais dentro do host.
+O gate usou o mesmo quadro seguro TGA RGBA 720×1280 para força 0, 70 e 100,
+com o preset facial fixo:
+
+| Verificação no host | 70% | 100% |
+|---|---:|---:|
+| Pixels alterados | 13.279 | 21.837 |
+| Fração do quadro | 1,440864% | 2,369466% |
+| Delta máximo | 97 | 107 |
+| Caixa alterada | `[60,419,663,1056]` | `[58,322,663,1054]` |
+
+Em zero, o render foi idêntico ao quadro apenas facial. Em 70 e 100 houve zero
+pixels alterados no rosto, no cabelo protegido ou fora da região permitida;
+100 expandiu a cobertura em relação a 70. O gate passou 10/10 verificações.
+
+A exportação completa com cabelo 70 e rosto aprovado produziu 210 quadros em
+7 s e foi concluída em 4,529 s no caminho CPU. Os quadros 0, 60, 120 e 209
+mantiveram a silhueta e o acabamento natural sem vazamento e não indicaram
+cintilação nos quadros inspecionados. Assim, os gates offline e real no host
+estão concluídos.

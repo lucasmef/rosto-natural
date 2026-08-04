@@ -30,6 +30,43 @@ check_optional() {
   fi
 }
 
+version_at_least_2_2() {
+  plist=$1
+  version=$(/usr/bin/plutil -extract CFBundleShortVersionString raw -o - \
+    "$plist" 2>/dev/null) || return 1
+  major=${version%%.*}
+  remainder=${version#*.}
+  minor=${remainder%%.*}
+  case "$major:$minor" in
+    *[!0-9:]*|:*) return 1 ;;
+  esac
+  [ "$major" -gt 2 ] || { [ "$major" -eq 2 ] && [ "$minor" -ge 2 ]; }
+}
+
+uxp_developer_tool_ready() {
+  for app in \
+    "/Applications/Adobe UXP Developer Tool.app" \
+    "/Applications/Adobe UXP Developer Tools/Adobe UXP Developer Tools.app"
+  do
+    [ -f "$app/Contents/Info.plist" ] || continue
+    version_at_least_2_2 "$app/Contents/Info.plist" && return 0
+  done
+  return 1
+}
+
+adobe_sdk_ready() {
+  root=$1
+  for required in \
+    Examples/Headers/AE_Effect.h \
+    Examples/Headers/AE_EffectVers.h \
+    Examples/Util/entry.h \
+    Examples/Util/Param_Utils.h \
+    Examples/Resources/AE_General.r
+  do
+    [ -f "$root/$required" ] || return 1
+  done
+}
+
 printf 'Rosto Natural — preflight sem abrir o Premiere\n'
 printf 'Projeto: %s\n\n' "$PROJECT_DIR"
 
@@ -52,11 +89,15 @@ check "Ponte MediaPipe compilada" test -s \
   "$PROJECT_DIR/dist/native/libRostoMediaPipe.dylib"
 
 AE_ROOT=${AE_SDK_ROOT:-"$PROJECT_DIR/vendor/AfterEffectsSDK"}
-check "Adobe C++ SDK" test -f "$AE_ROOT/Examples/Headers/AE_Effect.h"
+check "Adobe C++ SDK" adobe_sdk_ready "$AE_ROOT"
 check "Xcode completo" test -x "/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild"
-check "Compilador Metal" /usr/bin/xcrun --find metal
-check "UXP Developer Tool" test -d \
-  "/Applications/Adobe UXP Developer Tool.app"
+check "Compilador Metal" env \
+  DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer" \
+  /usr/bin/xcrun --find metal
+check "Linker Metal (metallib)" env \
+  DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer" \
+  /usr/bin/xcrun --find metallib
+check "UXP Developer Tool 2.2+" uxp_developer_tool_ready
 check_optional "Identidade de distribuição Apple" sh -c \
   '/usr/bin/security find-identity -v -p codesigning 2>/dev/null | grep -q "\".*\""'
 

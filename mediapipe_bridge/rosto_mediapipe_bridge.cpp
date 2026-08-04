@@ -98,7 +98,7 @@ int rosto_mp_face_detect(
       set_error({}, error, error_size);
       return 0;
     }
-    const auto& points = result->face_landmarks.front();
+    const auto& points = result->face_landmarks.front().landmarks;
     if (points.size() != kFaceLandmarkCount)
       throw std::runtime_error("Face Landmarker returned an unexpected mesh");
     for (size_t index = 0; index < kFaceLandmarkCount; ++index) {
