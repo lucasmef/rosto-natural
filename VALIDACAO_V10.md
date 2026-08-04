@@ -4,7 +4,7 @@
 
 O FaceTune é a única referência visual deste projeto. Uma alteração no
 algoritmo só pode ser aceita se `./scripts/validate_against_facetune.sh` passar.
-O teste compara 42 quadros de 14 pares `cru / -facetune`.
+O teste compara 51 quadros de 17 pares `cru / -facetune`.
 
 A exportação do FaceTune altera levemente o quadro inteiro por recodificação.
 Para não ensinar o plugin a copiar o codec, o validador estima uma transformação
@@ -17,23 +17,27 @@ Todos os 17 testes passaram:
 
 | Grupo | Rosto Natural | FaceTune | Resultado |
 |---|---:|---:|---|
-| Microtextura | 0,712442 | 0,693072 | passou |
-| Textura fina | 0,662486 | 0,634080 | passou |
-| Textura média | 0,675828 | 0,664900 | passou |
-| Nitidez da mandíbula | 0,989422 | 0,951763 | passou |
-| Alteração fora do rosto | 0,016259 | 1,955649 | passou |
-| Luminância da pele | -0,002275 | -0,001404 | passou |
-| Crominância A da pele | -0,000185 | -0,000470 | passou |
-| Crominância B da pele | -0,000458 | -0,000531 | passou |
-| Luminância das olheiras | -0,016221 | -0,016237 | passou |
-| Saturação dos olhos | -0,018220 | -0,018686 | passou |
-| Luminância dos olhos | -0,003323 | -0,003977 | passou |
-| Saturação dos lábios | +0,013932 | +0,013335 | passou |
-| Luminância dos lábios | -0,004345 | -0,003449 | passou |
+| Microtextura | 0,715541 | 0,706220 | passou |
+| Textura fina | 0,640518 | 0,634980 | passou |
+| Textura média | 0,652850 | 0,662981 | passou |
+| Nitidez da mandíbula | 0,989655 | 0,948513 | passou |
+| Alteração fora do rosto | 0,015519 | 2,014436 | passou |
+| Luminância da pele | -0,002251 | -0,001298 | passou |
+| Crominância A da pele | -0,000163 | -0,000554 | passou |
+| Crominância B da pele | -0,000436 | -0,000573 | passou |
+| Luminância das olheiras | -0,016058 | -0,015642 | passou |
+| Saturação dos olhos | -0,021593 | -0,020790 | passou |
+| Luminância dos olhos | -0,003425 | -0,003101 | passou |
+| Saturação dos lábios | +0,012897 | +0,012508 | passou |
+| Luminância dos lábios | -0,003626 | -0,003195 | passou |
 
-A distância direta de cor diminuiu 8,02% e a diferença estrutural diminuiu
-15,21% em relação ao vídeo cru. Todos os 14 vídeos melhoram individualmente:
-o pior ganho mediano é 2,77% em cor e 9,19% em estrutura.
+A distância direta de cor diminuiu 7,98% e a diferença estrutural diminuiu
+15,15% em relação ao vídeo cru. Todos os 17 vídeos melhoram individualmente:
+o pior ganho mediano é 2,82% em cor e 9,18% em estrutura.
+
+Em 03/08/2026 o agregado 17/17 foi recalculado a partir dos quatro relatórios
+existentes, cobrindo as mesmas 51 amostras. Os vídeos pessoais de origem não
+foram relidos nessa execução.
 
 ## Verificação visual
 
@@ -45,13 +49,29 @@ o pior ganho mediano é 2,77% em cor e 9,19% em estrutura.
 Cada imagem contém cru, plugin, FaceTune, checker alternado e mapas de textura
 amplificados quatro vezes.
 
-## Limites desta validação
+## Limites e repetição no host
 
-As imagens offline usam o fallback LBF de 68 pontos convertido para a malha de
-478 pontos porque a sessão bloqueada do macOS não fornece o contexto necessário
-ao MediaPipe. Ao desbloquear o Mac, a mesma bateria deve ser repetida com os 478
-pontos reais, seguida do teste do shader Metal e do efeito dentro do Premiere.
+Este gate reproduzível ainda usa o fallback LBF de 68 pontos convertido para a
+malha de 478 pontos. Em separado, a ponte MediaPipe real já passou com 478
+pontos finitos/normalizados e máscara Hair Segmenter válida. Em separado, o
+comportamento do preset foi validado sobre uma exportação real do Premiere,
+comparada ao controle cru seguro. Esse gate adicional não repete nem substitui
+a comparação FaceTune canônica de 51 amostras.
 
-A análise LBF não encontrou remodelagem consistente nos 70 pares de landmarks.
-Isso ainda não prova que o FaceTune nunca remodela; a conclusão será repetida
-com MediaPipe antes de decidir se um módulo geométrico é necessário.
+Essa repetição foi concluída em um clipe temporário seguro no Premiere 26.3.
+Num TGA RGBA 720×1280, o preset alterou 98.442 pixels (10,6816%), com delta
+absoluto médio 0,1468 por canal e máximo 11. A caixa de mudança
+`[206, 594, 556, 1005]` ficou sobre a face; as faixas superior de 420 px,
+inferior de 100 px e laterais de 80 px permaneceram idênticas. O mapa de
+diferença amplificado confirmou olhos, pele e lábios sem fundo alterado.
+
+A exportação completa tratada e o controle original, ambos produzidos pelo
+mesmo preset H.264 do Premiere, decodificaram 210/210 quadros. Nos quadros 0,
+60, 120 e 209 a presença permaneceu natural, sem mudança geométrica ou
+instabilidade visível. Isso complementa, sem substituir, o gate FaceTune
+canônico de 51 amostras.
+
+A análise LBF não encontrou remodelagem consistente nos pares de landmarks.
+Isso não prova que o FaceTune nunca remodela. Independentemente disso, o
+produto atual deliberadamente não aplica remodelagem geométrica, e o gate real
+do Premiere não mostrou deformação.

@@ -205,6 +205,26 @@ void flyaway_mask_resize_is_feathered() {
           "mask resize did not produce a feathered transition");
 }
 
+void flyaway_face_guard_is_absolute() {
+  rosto::FlyawayAnalysis analysis{
+      rosto::OwnedMask(64, 64), rosto::OwnedMask(64, 64)};
+  for (float& value : analysis.allowed_region.values) value = 1.0F;
+  analysis.allowed_pixels = 64 * 64;
+  rosto::FaceMesh mesh;
+  mesh.confidence = .95F;
+  mesh.points[10] = {.50F, .20F};
+  mesh.points[152] = {.50F, .80F};
+  mesh.points[234] = {.30F, .50F};
+  mesh.points[454] = {.70F, .50F};
+  rosto::protect_face_from_flyaways(analysis, mesh);
+  require(analysis.allowed_region.view().get(32, 32) == 0.0F &&
+              analysis.protected_hair.view().get(32, 32) == 1.0F,
+          "flyaway face guard did not make the face immutable");
+  require(analysis.allowed_region.view().get(1, 1) == 1.0F &&
+              analysis.protected_hair.view().get(1, 1) == 0.0F,
+          "flyaway face guard escaped the face oval");
+}
+
 void flyaway_reconstruction_is_sparse() {
   rosto::OwnedImage image(48, 32);
   rosto::OwnedMask candidates(48, 32);
@@ -387,12 +407,13 @@ int main(int argc, char** argv) {
     flyaway_bypass_is_exact();
     flyaway_analysis_separates_mass_and_fringe();
     flyaway_mask_resize_is_feathered();
+    flyaway_face_guard_is_absolute();
     flyaway_reconstruction_is_sparse();
     flyaway_protected_hair_wins();
     flyaway_temporal_mask_rejects_flicker();
     guided_flyaway_preserves_vertical_background();
     guided_flyaway_intensity_expands_coverage();
-    std::cout << "rosto_core: 15 tests passed\n";
+    std::cout << "rosto_core: 16 tests passed\n";
     return 0;
   } catch (const std::exception& e) {
     std::cerr << "FAILED: " << e.what() << '\n';

@@ -8,8 +8,8 @@ import ctypes
 import json
 from pathlib import Path
 
-import cv2
 import numpy as np
+from PIL import Image as PillowImage
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,19 +74,20 @@ def main() -> int:
     args = parse_args()
     if not args.library.is_file():
         raise FileNotFoundError(args.library)
-    bgr = cv2.imread(str(args.image), cv2.IMREAD_COLOR)
-    if bgr is None:
+    try:
+        image = PillowImage.open(args.image).convert("RGBA")
+    except OSError as exc:
         raise FileNotFoundError(args.image)
-    scale = min(1.0, 640.0 / max(bgr.shape[:2]))
-    bgr = cv2.resize(
-        bgr,
-        (
-            max(1, int(bgr.shape[1] * scale)),
-            max(1, int(bgr.shape[0] * scale)),
-        ),
-        interpolation=cv2.INTER_AREA,
-    )
-    rgba = np.ascontiguousarray(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGBA))
+    scale = min(1.0, 640.0 / max(image.width, image.height))
+    if scale < 1.0:
+        image = image.resize(
+            (
+                max(1, int(image.width * scale)),
+                max(1, int(image.height * scale)),
+            ),
+            PillowImage.Resampling.LANCZOS,
+        )
+    rgba = np.ascontiguousarray(np.asarray(image, dtype=np.uint8))
     height, width = rgba.shape[:2]
     library = ctypes.CDLL(str(args.library))
     configure(library)

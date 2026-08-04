@@ -167,6 +167,54 @@ FlyawayAnalysis analyze_flyaways(
   return analysis;
 }
 
+void protect_face_from_flyaways(
+    FlyawayAnalysis& analysis,
+    const FaceMesh& mesh,
+    float padding) {
+  if (analysis.allowed_region.width <= 0 ||
+      analysis.allowed_region.height <= 0 ||
+      analysis.protected_hair.width != analysis.allowed_region.width ||
+      analysis.protected_hair.height != analysis.allowed_region.height)
+    throw std::invalid_argument("flyaway face guard masks must match");
+  if (mesh.confidence <= 0.0F) return;
+
+  const Point top = mesh.points[10];
+  const Point bottom = mesh.points[152];
+  const Point left = mesh.points[234];
+  const Point right = mesh.points[454];
+  const Point center{
+      (top.x + bottom.x + left.x + right.x) * .25F,
+      (top.y + bottom.y + left.y + right.y) * .25F};
+  const float width = std::hypot(right.x - left.x, right.y - left.y);
+  const float height = std::hypot(bottom.x - top.x, bottom.y - top.y);
+  if (width < 1e-4F || height < 1e-4F) return;
+  const float scale = 1.0F + std::max(0.0F, padding);
+  const float radius_x = width * .56F * scale;
+  const float radius_y = height * .56F * scale;
+  const float angle = std::atan2(right.y - left.y, right.x - left.x);
+  const float cosine = std::cos(-angle);
+  const float sine = std::sin(-angle);
+
+  for (int y = 0; y < analysis.allowed_region.height; ++y) {
+    const float ny = (y + .5F) / analysis.allowed_region.height;
+    for (int x = 0; x < analysis.allowed_region.width; ++x) {
+      const float nx = (x + .5F) / analysis.allowed_region.width;
+      const float dx = nx - center.x;
+      const float dy = ny - center.y;
+      const float qx = (cosine * dx - sine * dy) / radius_x;
+      const float qy = (sine * dx + cosine * dy) / radius_y;
+      if (qx * qx + qy * qy > 1.0F) continue;
+      if (analysis.allowed_region.at(x, y) > 0.0F &&
+          analysis.allowed_pixels > 0)
+        --analysis.allowed_pixels;
+      analysis.allowed_region.at(x, y) = 0.0F;
+      if (analysis.protected_hair.at(x, y) < .5F)
+        ++analysis.protected_pixels;
+      analysis.protected_hair.at(x, y) = 1.0F;
+    }
+  }
+}
+
 OwnedMask resize_mask(MaskView source, int width, int height) {
   if (!source.values || source.width <= 0 || source.height <= 0 ||
       width <= 0 || height <= 0)

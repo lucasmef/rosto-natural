@@ -91,6 +91,14 @@ FlyawayAnalysis analyze_flyaways(
     MaskView hair_probability,
     const FlyawayAnalysisParams& params = {});
 
+// Removes the complete face oval from the authorized reconstruction region.
+// Hair segmentation occasionally produces low-confidence false positives on
+// brows or skin; this conservative guard makes those pixels immutable.
+void protect_face_from_flyaways(
+    FlyawayAnalysis& analysis,
+    const FaceMesh& mesh,
+    float padding = 0.08F);
+
 // Bilinear resizing keeps analysis masks feathered when a 640 px inference is
 // promoted to the full Premiere render resolution.
 OwnedMask resize_mask(MaskView source, int width, int height);
