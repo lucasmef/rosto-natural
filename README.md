@@ -41,7 +41,7 @@ prepare essas dependências antes de executar seu diagnóstico.
 
 ## Privacidade e versionamento
 
-Este repositório é privado. Credenciais, ambientes virtuais, builds, mídias pessoais
+O código-fonte deste repositório é público. Credenciais, ambientes virtuais, builds, mídias pessoais
 e relatórios locais ficam fora do versionamento pelo `.gitignore`.
 Em `local-dev/`, somente as duas pontes C++ necessárias ao build da integração
 são versionadas; os experimentos e suas evidências permanecem no computador.
