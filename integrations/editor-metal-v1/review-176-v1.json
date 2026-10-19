@@ -1,0 +1,146 @@
+{
+  "version": "176-full-visibility-v001",
+  "sourceSha256": "861d71dc22dc81e1106139dd4446f6781e81c33f81eeecd7e3fc47d27e36cc22",
+  "cuts": [
+    0,
+    371,
+    663,
+    1003
+  ],
+  "cutReview": "Abrupt source edits confirmed in before/after images at 370/371, 662/663, 1002/1003; not interpolated across.",
+  "fadeFrames": 12,
+  "spatialFeatherPx": 50,
+  "rectangles": [
+    {
+      "frames": [
+        0,
+        33
+      ],
+      "box": [
+        0,
+        1000,
+        640,
+        1920
+      ],
+      "reason": "previously reviewed intro corridor"
+    },
+    {
+      "frames": [
+        70,
+        99
+      ],
+      "box": [
+        670,
+        1060,
+        1080,
+        1920
+      ],
+      "reason": "right pompom pass around 1.37s"
+    },
+    {
+      "frames": [
+        223,
+        251
+      ],
+      "box": [
+        730,
+        1000,
+        1080,
+        1920
+      ],
+      "reason": "right pompom pass around 3.97s"
+    },
+    {
+      "frames": [
+        378,
+        402
+      ],
+      "box": [
+        0,
+        1240,
+        620,
+        1920
+      ],
+      "reason": "left lower jaw proximity around 6.5s"
+    },
+    {
+      "frames": [
+        448,
+        475
+      ],
+      "box": [
+        680,
+        1160,
+        1080,
+        1920
+      ],
+      "reason": "right lower jaw proximity around 7.65s"
+    },
+    {
+      "frames": [
+        670,
+        698
+      ],
+      "box": [
+        0,
+        1100,
+        640,
+        1920
+      ],
+      "reason": "left pompom pass around 11.3s"
+    },
+    {
+      "frames": [
+        825,
+        860
+      ],
+      "box": [
+        710,
+        1160,
+        1080,
+        1920
+      ],
+      "reason": "right pompom proximity around 14.0s"
+    },
+    {
+      "frames": [
+        908,
+        968
+      ],
+      "box": [
+        650,
+        1120,
+        1080,
+        1920
+      ],
+      "reason": "right lower jaw proximity during head turn around 15.3-16s"
+    },
+    {
+      "frames": [
+        1009,
+        1036
+      ],
+      "box": [
+        0,
+        1150,
+        620,
+        1920
+      ],
+      "reason": "left pompom pass around 17.0s"
+    }
+  ],
+  "notes": "Manually specified conservative corridors for this exact source; contacts inspected at 0.5s and dense risk/cut samples. White component scan was a review aid with collar false positives, not a reliable object detector. Hands is not a pompom detector. Unknown detector failures retain global bypass. Source images inside zero-weight regions remain unchanged before scaling/encoding.",
+  "width": 1080,
+  "height": 1920,
+  "frames": 1343,
+  "fps": 60,
+  "reviewed": true,
+  "reviewNotes": "176 original: source contacts/risk frames and nine conservative pompom corridors examined in v005. Technical visibility review, not aesthetic or editor approval.",
+  "fullBypassIntervals": [],
+  "reviewedHandOverrides": [
+    [
+      0,
+      33
+    ]
+  ]
+}

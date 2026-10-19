@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "rosto/retouch.hpp"
+#include "rosto/finishing.hpp"
 
 namespace {
 rosto::OwnedImage load_ppm(const std::string& path) {
@@ -67,12 +68,13 @@ int main(int argc, char** argv) {
                  "[--master value] [--skin value] "
                  "[--preserve-texture value] [--under-eye value] "
                  "[--tone value] [--shine value] [--eyes value] "
-                 "[--blush value] [--lips value]\n";
+                 "[--blush value] [--lips value] [--concealer value] [--lip-coverage value]\n";
     return 2;
   }
   try {
     auto image = load_ppm(argv[1]);
     rosto::RetouchParams params;
+    rosto::LocalFinishParams local;
     std::string mesh_path;
     std::vector<float> geometry;
     for (int i = 3; i < argc; ++i) {
@@ -97,14 +99,23 @@ int main(int argc, char** argv) {
         params.blush = std::stof(argv[++i]);
       } else if (argument == "--lips" && i + 1 < argc) {
         params.lips = std::stof(argv[++i]);
+      } else if (argument == "--concealer" && i + 1 < argc) {
+        local.concealer = std::stof(argv[++i]);
+      } else if (argument == "--lip-coverage" && i + 1 < argc) {
+        local.lip_coverage = std::stof(argv[++i]);
       } else {
         geometry.push_back(std::stof(argument));
       }
     }
     if (!mesh_path.empty()) {
       if (!geometry.empty()) throw std::runtime_error("unexpected geometry");
-      rosto::process(image.view(), load_mesh(mesh_path), params);
+      const auto mesh = load_mesh(mesh_path);
+      rosto::process(image.view(), mesh, params);
+      if (local.concealer > 0 || local.lip_coverage > 0)
+        rosto::process_local(image.view(), rosto::local_masks(mesh, image.width, image.height), local);
     } else {
+      if (local.concealer > 0 || local.lip_coverage > 0)
+        throw std::runtime_error("local finishing requires --mesh");
       rosto::FaceGeometry face{};
       if (!geometry.empty()) {
         if (geometry.size() != 4)

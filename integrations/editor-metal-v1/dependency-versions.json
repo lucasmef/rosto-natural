@@ -1,0 +1,9 @@
+{
+  "numpy": "1.26.4",
+  "opencv-contrib-python": "4.11.0.86",
+  "mediapipe": "0.10.21",
+  "python": "Python 3.12.14",
+  "clang": "Apple clang version 21.0.0 (clang-2100.3.34.2)",
+  "ffmpeg": "ffmpeg version 7.1 Copyright (c) 2000-2024 the FFmpeg developers",
+  "note": "Existing local runtime; no installation performed. Metal kernels compiled at runtime with fast math disabled."
+}

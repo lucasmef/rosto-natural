@@ -1,4 +1,6 @@
 #include "rosto/retouch.hpp"
+#include "rosto/complexion.hpp"
+#include "rosto/retouch_masks.hpp"
 
 #include <cmath>
 #include <functional>
@@ -262,6 +264,17 @@ void blur(const ImageView src, OwnedImage& dst, int radius) {
 
 }  // namespace
 
+RetouchMaskGrid retouch_mask_grid(const FaceMesh& mesh, int width, int height) {
+  if (width <= 0 || height <= 0 || !mesh.valid())
+    throw std::invalid_argument("invalid retouch mask input");
+  for (auto p : mesh.points)
+    if (!std::isfinite(p.x) || !std::isfinite(p.y) ||
+        p.x < 0 || p.x > 1 || p.y < 0 || p.y > 1)
+      throw std::invalid_argument("invalid retouch mesh");
+  auto m = build_mesh_masks(mesh, width, height);
+  return {m.width, m.height, std::move(m.pixels)};
+}
+
 MaskSample sample_masks(float nx, float ny, const FaceGeometry& f) {
   const float c = std::cos(-f.roll), s = std::sin(-f.roll);
   const float dx = nx - f.center.x, dy = ny - f.center.y;
@@ -292,7 +305,8 @@ MaskSample sample_masks(float nx, float ny, const FaceGeometry& f) {
 
 template <typename MaskProvider>
 void process_impl(ImageView image, float confidence, const RetouchParams& p,
-                  MaskProvider&& masks) {
+                  MaskProvider&& masks, const ComplexionParams* complexion = nullptr,
+                  const FaceMesh* mesh = nullptr) {
   if (!image.rgba || image.width <= 0 || image.height <= 0 || p.before_after ||
       p.master <= 0.0F || confidence <= 0.0F) return;
 
@@ -308,6 +322,12 @@ void process_impl(ImageView image, float confidence, const RetouchParams& p,
   const auto fv = fine.view();
   const auto cv = coarse.view();
   const float master = clamp01(p.master) * clamp01(confidence);
+  const float fw = mesh ? point_distance(mesh->points[234],mesh->points[454]) : 1.F;
+  const float fh = mesh ? point_distance(mesh->points[10],mesh->points[152]) : 1.F;
+  const Point chin = mesh ? Point{mesh->points[200].x,
+      (mesh->points[200].y+mesh->points[152].y)*.5F} : Point{};
+  const float roll = mesh ? std::atan2(mesh->points[454].y-mesh->points[234].y,
+                                      mesh->points[454].x-mesh->points[234].x) : 0.F;
   for (int y = 0; y < image.height; ++y) {
     for (int x = 0; x < image.width; ++x) {
       const float nx = (static_cast<float>(x) + 0.5F) / image.width;
@@ -329,14 +349,31 @@ void process_impl(ImageView image, float confidence, const RetouchParams& p,
           std::abs(mid.b - low.b)});
       const float fine_floor = 0.075F + preserve * 0.45F;
       const float fine_ceiling = 0.45F + preserve * 0.45F;
-      const float texture = fine_floor +
+      float texture = fine_floor +
           (fine_ceiling - fine_floor) *
           smoothstep(0.006F, 0.035F, fine_magnitude);
       const float mid_floor = 0.085F + preserve * 0.35F;
       const float mid_ceiling = 0.45F + preserve * 0.45F;
-      const float mid_preserve = mid_floor +
+      float mid_preserve = mid_floor +
           (mid_ceiling - mid_floor) *
           smoothstep(0.004F, 0.030F, mid_magnitude);
+      float cheek_weight=0;
+      if(complexion && mesh) {
+        const float chin_weight=oriented_ellipse(nx,ny,chin,fw*.42F,fh*.20F,roll,.65F);
+        const float reduce=clamp01(complexion->detail_reduction)+
+            clamp01(complexion->chin_reduction)*chin_weight;
+        texture*=1-clamp01(reduce)*.85F;
+        mid_preserve*=1-clamp01(reduce)*.92F;
+        cheek_weight=std::max(
+            oriented_ellipse(nx,ny,mesh->points[50],fw*.22F,fh*.13F,roll,.80F),
+            oriented_ellipse(nx,ny,mesh->points[280],fw*.22F,fh*.13F,roll,.80F))*m.skin;
+        // Inner cheeks were already close to the reference. Taper the outer
+        // blush correction before it reaches those areas.
+        const float inner_cheek=std::max(
+            oriented_ellipse(nx,ny,mesh->points[205],fw*.095F,fh*.07F,roll,.80F),
+            oriented_ellipse(nx,ny,mesh->points[425],fw*.095F,fh*.07F,roll,.80F));
+        cheek_weight*=1-inner_cheek;
+      }
       Color smooth{
           low.r + (mid.r - low.r) * mid_preserve + (src.r - mid.r) * texture,
           low.g + (mid.g - low.g) * mid_preserve + (src.g - mid.g) * texture,
@@ -358,6 +395,26 @@ void process_impl(ImageView image, float confidence, const RetouchParams& p,
           (contour_edge_guard - interior_edge_guard) * contour_band;
       Color out = mix(src, smooth, clamp01(master * clamp01(p.skin) *
                                            m.skin * 2.40F * edge_guard));
+      if(complexion && cheek_weight>0) {
+        // Redistribute only cheek chroma using the existing coarse layer.
+        // Chroma preserves luma; the separate lift is bounded and rolls off
+        // before source speculars. No geometry or extra blur pass is applied.
+        const float out_y=luma(out),low_y=luma(low);
+        const float gate=(1-smoothstep(.72F,.91F,out_y))*cheek_weight*master;
+        const float diffusion=clamp01(complexion->blush_diffusion)*gate;
+        const float saturation=clamp01(complexion->blush_chroma_reduction)*gate;
+        out.r=clamp01(out.r+((low.r-low_y)-(out.r-out_y))*diffusion);
+        out.g=clamp01(out.g+((low.g-low_y)-(out.g-out_y))*diffusion);
+        out.b=clamp01(out.b+((low.b-low_y)-(out.b-out_y))*diffusion);
+        // Reduce the red/green opponent component, retaining the warm yellow
+        // component. The vector has zero Rec.709 luma before clipping.
+        out.r=clamp01(out.r-saturation*.12F);
+        out.g=clamp01(out.g+saturation*.12F*(.2126F/.7152F));
+        const float lift=clamp01(complexion->blush_lift)*gate*(8.F/255.F);
+        out.r=clamp01(out.r+lift);
+        out.g=clamp01(out.g+lift);
+        out.b=clamp01(out.b+lift);
+      }
 
       const float lum = luma(out);
       const float shine_gate = smoothstep(0.62F, 0.95F, lum);
@@ -422,6 +479,22 @@ void process(ImageView image, const FaceMesh& mesh, const RetouchParams& p) {
   process_impl(image, mesh.confidence, p, [&](float x, float y) {
     return masks.sample(x, y);
   });
+}
+
+void process_complexion(ImageView image,const FaceMesh& mesh,const RetouchParams& p,
+                        const ComplexionParams& input) {
+  if(!mesh.valid())return;
+  auto c=input;
+  auto finite=[](float v){return std::isfinite(v)?clamp01(v):0.F;};
+  c.detail_reduction=finite(c.detail_reduction);c.chin_reduction=finite(c.chin_reduction);
+  c.blush_diffusion=finite(c.blush_diffusion);c.blush_chroma_reduction=finite(c.blush_chroma_reduction);
+  c.blush_lift=finite(c.blush_lift);
+  if(c.detail_reduction==0&&c.chin_reduction==0&&c.blush_diffusion==0&&c.blush_chroma_reduction==0&&c.blush_lift==0) {
+    process(image,mesh,p);return;
+  }
+  for(auto q:mesh.points)if(!std::isfinite(q.x)||!std::isfinite(q.y)||q.x<0||q.x>1||q.y<0||q.y>1)return;
+  const MeshMaskMap masks=build_mesh_masks(mesh,image.width,image.height);
+  process_impl(image,mesh.confidence,p,[&](float x,float y){return masks.sample(x,y);},&c,&mesh);
 }
 
 }  // namespace rosto

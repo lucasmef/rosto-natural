@@ -1,0 +1,83 @@
+{
+  "version": "editor-metal-F5-v1",
+  "files": {
+    "dependency-versions.json": {
+      "sha256": "ebefc3513a1c85363568267f621e2016e5cf43884bf4c5479e1bedd10bc7123a",
+      "bytes": 383
+    },
+    "PROMPT_PARA_EDITOR.md": {
+      "sha256": "319180e431843cba7db81955ee76790dba84a143f60b01fded0e1f8e2b303bb6",
+      "bytes": 4628
+    },
+    "engine.h": {
+      "sha256": "d4779eb2bf44b1b23341cf5ff0560473223d8d679a30b482dd933451431098ba",
+      "bytes": 853
+    },
+    "runner.py": {
+      "sha256": "0eb9b0027a26c6111cdc8bdf3df3c057a66e51e032dcec2c51e0f729dd48e5e8",
+      "bytes": 18143
+    },
+    "backend.py": {
+      "sha256": "21615e5dfac97c842684a152890e0373013661189758c77bf2f4c1319aa1f15d",
+      "bytes": 4271
+    },
+    "review-176-v1.json": {
+      "sha256": "f23eb29c28c2c11739d024c00987554dd336d1b6833e9dd1e3421334fa8d0949",
+      "bytes": 2895
+    },
+    "engine.mm": {
+      "sha256": "8c4976dd5f83b334f5a17c024efae1298480b47179e1281e96ba79f6c472aa22",
+      "bytes": 6499
+    },
+    "VALIDATION.md": {
+      "sha256": "534aacebfddcd19f10d16d3b55d9096cd502cda24d9b1fc353deba59ed3c70fa",
+      "bytes": 7128
+    },
+    "README.md": {
+      "sha256": "c8781e12d43b710ecd7f8f04b05b8c8d5d83ee1fb0dcb9478c2fc31c267c0fa7",
+      "bytes": 8562
+    },
+    "build.sh": {
+      "sha256": "b0bdc54830cb27d2f706c99d296f1b5b99d636384b98a1af588e0cb8b64701cf",
+      "bytes": 543
+    },
+    "test_contract.py": {
+      "sha256": "4ef8527908ffcb5504910cc3915718c62a5bc30d8433591f487a5a8a7cd5b2b1",
+      "bytes": 1679
+    },
+    "test_parity.py": {
+      "sha256": "003ae3ee99932fb953b7363df2eb826d10ad4346c6be12126b53be5084048bf2",
+      "bytes": 3160
+    },
+    "F5.metal": {
+      "sha256": "e0cb78421dd885bfc5e6ab38a23594e3a71fa3135586886b7563170d23bffe73",
+      "bytes": 5918
+    },
+    "preset-F5-v004.json": {
+      "sha256": "ddf2c5b2d59464be7087ecd2c25eb6dab8919cb036e3ce9479a28f9cf3a0eaed",
+      "bytes": 1902
+    },
+    "test_failures.py": {
+      "sha256": "e941e3e8756fc29133c7e71edc5d435354906a195fba49c27f9fe016aaf25fd2",
+      "bytes": 1441
+    },
+    "build/libRostoMetalF5.dylib": {
+      "sha256": "49bfa098706c6daad5d2becce0f9e9785409392526c61e4d0691bd39acdc851a",
+      "bytes": 112904
+    }
+  },
+  "presetStatus": "experimental-not-approved",
+  "installedIntoEditor": false,
+  "buildSources": {
+    "core/src/retouch.cpp": "32b50a2dc79da7652da00b34e51a7355c556bf8746cf67a33e7f55a5609045c5",
+    "core/src/finishing.cpp": "2f61f6c49bfb9f2186cda3bd95251b67c0ee2c0e4c839bb4d5f3a331ed4c621e",
+    "core/src/temporal.cpp": "f18c3b8a866af43300b756ee83cc8f11a02401b20aeb45438edfaf5cabe15859",
+    "core/include/rosto/retouch_masks.hpp": "ca4bf9ce36d4c5cea3480a36eb23610138a408bc9b47d626770ff4f2031bc5f2",
+    "core/include/rosto/retouch.hpp": "0e6ba5c9b639e5f7daf6e447deb45c2117396fff8bf9b7b02ea4c00c113d692a",
+    "core/include/rosto/finishing.hpp": "6ea4451919abf025dd6012840160b345b809e2dc9c9be8a437d2a8cb504bb919",
+    "core/include/rosto/complexion.hpp": "65441cfd0310ea911e945abe375c7c0221ae15e2c99cea372f5ff33af344a6da",
+    "core/include/rosto/types.hpp": "77cd7fc5c1a294c4d58a760ea4902f58cc269daa9a4844a571ec47e559838a8b",
+    "local-dev/v004/bridge.cpp": "2b5ad92c02f196c3ed20a3aeba1384ce779f8c8def01c6c18d043d35274c7f2f",
+    "local-dev/v002/bridge.cpp": "b3853bd176ecce80ddcaca4490e0b98c3d21d29e84604d0de1677cf5d39db635"
+  }
+}

@@ -1,5 +1,59 @@
 # Rosto Natural
 
+Tratamento facial local para vídeo, com preservação de textura e sem alteração
+intencional da geometria do rosto. O projeto reúne um núcleo C++20, um pipeline
+experimental com Metal para um editor externo e um adaptador Adobe em desenvolvimento.
+
+## Estado do projeto
+
+- **Núcleo C++:** processamento de pele, máscaras, acabamento e estabilização temporal.
+- **Integração Metal F5:** runner offline com tracking na CPU, tratamento na GPU e
+  decode/encode com FFmpeg. O preset F5 v004 é experimental e exige revisão por vídeo.
+- **Adobe Premiere Pro:** adaptador e painel UXP presentes; a instalação e a validação
+  completa no host continuam pendentes.
+
+A integração mais recente está documentada em
+[integrations/editor-metal-v1/README.md](integrations/editor-metal-v1/README.md).
+Ela tem um shader próprio e não usa o shader Metal legado da frente Adobe.
+
+## Começar pelo núcleo
+
+Em macOS, com Command Line Tools e Node.js disponíveis:
+
+```sh
+./scripts/build_core.sh
+python3 tools/validate_adobe_contract.py
+```
+
+Alternativamente, com CMake 3.24 ou superior e compilador C++20:
+
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+A integração de vídeo requer Python 3.12, NumPy 1.26.4,
+OpenCV contrib 4.11.0.86, MediaPipe 0.10.21, FFmpeg e GPU Metal.
+O clone não inclui `.venv`, FFmpeg local, modelos, SDKs ou mídias de referência.
+As instruções da integração descrevem o ambiente local anteriormente utilizado;
+prepare essas dependências antes de executar seu diagnóstico.
+
+## Privacidade e versionamento
+
+Este repositório é privado. Credenciais, ambientes virtuais, builds, mídias pessoais
+e relatórios locais ficam fora do versionamento pelo `.gitignore`.
+Em `local-dev/`, somente as duas pontes C++ necessárias ao build da integração
+são versionadas; os experimentos e suas evidências permanecem no computador.
+Os exemplos usam caminhos genéricos, que devem ser substituídos no ambiente local.
+Nunca adicione arquivos `.env`, chaves ou vídeos ao commit.
+
+## Referência histórica: frente Adobe v0.11
+
+Os resultados e números abaixo são registros da validação anterior, não uma
+nova medição nem uma garantia de desempenho ou aprovação do pipeline F5.
+
+
 Efeito local de aprimoramento facial, maquiagem leve e acabamento de cabelos
 rebeldes para Adobe Premiere Pro. A v0.11 foi calibrada usando os 15 pares
 `cru / -facetune` encontrados neste Mac. O FaceTune é a única referência
@@ -72,7 +126,7 @@ Relatórios:
 Execute novamente com:
 
 ```sh
-./scripts/validate_against_facetune.sh "/Users/lucas/Movies/Vídeos/Edit"
+./scripts/validate_against_facetune.sh "/CAMINHO/referencias"
 ```
 
 ## Cabelos rebeldes
@@ -111,7 +165,7 @@ Relatórios e prévia:
 python3 tools/validate_adobe_contract.py
 ```
 
-Resultado atual:
+Resultados registrados na validação anterior:
 
 - 15 testes do núcleo C++;
 - 1 teste do adaptador C++/MediaPipe;
@@ -216,7 +270,7 @@ processo do Premiere estiver aberto.
 - `tests/`: testes C++ e JavaScript;
 - `scripts/`: preparação, build, pacote e instalação protegida.
 
-## Limite atual
+## Limites registrados na frente Adobe
 
 Todos os gates offline passam. Ainda faltam o SDK Adobe, o Xcode completo, o
 UXP Developer Tool, a conclusão da biblioteca MediaPipe e o primeiro

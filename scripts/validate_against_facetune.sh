@@ -2,7 +2,7 @@
 set -eu
 
 PROJECT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-REFERENCE_DIR=${1:-"/Users/lucas/Movies/Vídeos/Edit"}
+REFERENCE_DIR=${1:?"Uso: $0 /caminho/para/referencias"}
 
 cd "$PROJECT_DIR"
 ./scripts/build_core.sh

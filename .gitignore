@@ -58,3 +58,42 @@ coverage/
 *.tmp
 *.bak
 *~
+
+# Isolated offline development environment and private execution evidence
+/.venv/
+/.local/
+/local-dev/runs/
+/local-dev/v001/mpl-cache/
+
+# Credenciais, configuracoes privadas e chaves
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+credentials*.json
+secrets*.json
+/.aws/
+/.codex/
+/.agents/
+
+# Evidencias pessoais e experimentos locais; manter apenas pontes de build
+/local-dev/*
+!/local-dev/v002/
+/local-dev/v002/*
+!/local-dev/v002/bridge.cpp
+!/local-dev/v004/
+/local-dev/v004/*
+!/local-dev/v004/bridge.cpp
+**/build/
+*.ppm
+*.npz
+*.npy
+*.heic
+*.HEIC
+*.webp
+*.gif
+*.pdf

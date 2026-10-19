@@ -29,6 +29,8 @@ mkdir -p "$BUILD_DIR"
 "$CXX" -std=c++20 -O3 -DNDEBUG -stdlib=libc++ -isysroot "$SDK_PATH" \
   -I"$PROJECT_DIR/core/include" \
   "$PROJECT_DIR/core/src/retouch.cpp" \
+  "$PROJECT_DIR/core/src/finishing.cpp" \
+  "$PROJECT_DIR/core/src/temporal.cpp" \
   "$PROJECT_DIR/tools/rosto_cli.cpp" \
   -o "$BUILD_DIR/rosto_cli"
 
@@ -59,3 +61,10 @@ elif command -v node >/dev/null 2>&1; then
 else
   echo "warning: Node.js unavailable; UXP tests skipped" >&2
 fi
+
+"$CXX" -std=c++20 -O3 -DNDEBUG -stdlib=libc++ -isysroot "$SDK_PATH" \
+ -Wall -Wextra -Wpedantic -I"$PROJECT_DIR/core/include" \
+ "$PROJECT_DIR/core/src/retouch.cpp" "$PROJECT_DIR/core/src/temporal.cpp" \
+ "$PROJECT_DIR/core/src/finishing.cpp" "$PROJECT_DIR/tests/finishing_tests.cpp" \
+ -o "$BUILD_DIR/rosto_finishing_tests"
+"$BUILD_DIR/rosto_finishing_tests"

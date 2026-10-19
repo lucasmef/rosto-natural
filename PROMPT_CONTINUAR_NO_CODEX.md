@@ -1,20 +1,20 @@
 # Prompt para continuar o projeto Rosto Natural
 
 Copie todo o texto abaixo ao criar uma nova tarefa do Codex vinculada à pasta
-`/Users/lucas/Documents/Codex/rosto-natural`.
+`/CAMINHO/rosto-natural`.
 
 ---
 
 Trabalhe exclusivamente no projeto **Rosto Natural**, localizado em:
 
-`/Users/lucas/Documents/Codex/rosto-natural`
+`/CAMINHO/rosto-natural`
 
 Repositório privado:
 
 `https://github.com/lucasmef/rosto-natural`
 
 Não trabalhe em uma cópia improvisada e não misture este projeto com
-`/Users/lucas/Documents/Codex/voz-neural`.
+`/CAMINHO/voz-neural`.
 
 ## Meta principal
 
@@ -49,7 +49,7 @@ novo ou uma cópia segura, com validação visual e objetiva das exportações.
   desempenho fluido dependerá da integração Metal.
 
 Os vídeos reais de referência ficam em
-`/Users/lucas/Movies/Vídeos/Edit`. Eles são material pessoal e devem ser usados
+`/CAMINHO/referencias`. Eles são material pessoal e devem ser usados
 somente para leitura e validação; nunca mover, renomear, sobrescrever, apagar ou
 enviar esses arquivos ao GitHub ou a serviços externos.
 

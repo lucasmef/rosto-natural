@@ -1,0 +1,69 @@
+{
+  "version": "complexion-F5-v004-experimental",
+  "status": "not-approved",
+  "baseline": {
+    "master": 0.72,
+    "skin": 0.58,
+    "preserve_texture": 0.62,
+    "under_eye": 0.3,
+    "tone": 0.24,
+    "shine": 0.3,
+    "eyes": 0.06,
+    "blush": 0,
+    "lips": 0,
+    "flyaways": 0
+  },
+  "local": {
+    "concealer": 0.18,
+    "lip_chroma": 0.8,
+    "cheek_lift": 0.6
+  },
+  "temporal": {
+    "fadeFrames": 12,
+    "featureDisplacementCapPx": 1.0,
+    "reuseVerifiedV003GeometryAndSafety": false,
+    "geometry": "recompute from unchanged raw tracking; reviewed intro corridor only; same expression cap"
+  },
+  "visibility": {
+    "manualBypassIntervalsHalfOpen": {
+      "176-intro": [
+        [
+          0,
+          30
+        ]
+      ],
+      "176-expression": []
+    },
+    "marginFrames": 3,
+    "unknown": "bypass; Hands does not detect pompoms",
+    "spatialBypassIntro": {
+      "framesHalfOpen": [
+        0,
+        33
+      ],
+      "unsafeRectangle": [
+        0,
+        1000,
+        640,
+        1920
+      ],
+      "inwardSafeFeatherPx": 50,
+      "releaseFrames": 12,
+      "review": "manually specified conservative corridor; local frame sequence inspection; Hands is not a pompom detector"
+    }
+  },
+  "color": "Rec709 encoded RGB8 full; accurate_rnd+full_chroma_int decode; ProRes422 limited 10-bit; no linearization, no tone mapping",
+  "changes": [
+    "F4 color/protection controls unchanged",
+    "Same original fine/coarse skin decomposition; extra detail shrink only in lower face, no general skin increment",
+    "Localized cheek chroma diffusion, red/green compression preserving warm yellow, bounded outer-cheek lift",
+    "Protect already-matched inner cheek color from outer-blush correction"
+  ],
+  "complexion": {
+    "detail_reduction": 0,
+    "chin_reduction": 0.24,
+    "blush_diffusion": 0.55,
+    "blush_chroma_reduction": 0.09,
+    "blush_lift": 0.8
+  }
+}

@@ -16,6 +16,7 @@ add_library(rosto_core STATIC
   core/src/flyaway.cpp
   core/src/retouch.cpp
   core/src/temporal.cpp
+  core/src/finishing.cpp
 )
 set_target_properties(rosto_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(rosto_core PUBLIC core/include)
@@ -54,6 +55,9 @@ if(ROSTO_BUILD_TESTS)
   add_executable(rosto_tests tests/core_tests.cpp)
   target_link_libraries(rosto_tests PRIVATE rosto_core)
   add_test(NAME rosto_core_tests COMMAND rosto_tests)
+  add_executable(rosto_finishing_tests tests/finishing_tests.cpp)
+  target_link_libraries(rosto_finishing_tests PRIVATE rosto_core)
+  add_test(NAME rosto_finishing_tests COMMAND rosto_finishing_tests)
 
   if(NOT ROSTO_WITH_MEDIAPIPE)
     add_executable(rosto_mediapipe_adapter_tests
